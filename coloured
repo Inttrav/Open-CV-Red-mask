@@ -1,0 +1,34 @@
+import numpy as np
+import cv2
+
+cap = cv2.VideoCapture(0)
+
+while True:
+
+    ret, img = cap.read()
+    img = cv2.resize(img, (1080, 720))
+    
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    
+    lower_red = np.array([160,100,20])
+    upper_red = np.array([179,255,255])
+
+    mask = cv2.inRange(hsv, lower_red, upper_red)
+    mask_inv = cv2.bitwise_not(mask)
+    res = cv2.bitwise_and(img, img, mask=mask)
+    background = cv2.bitwise_and(gray, gray, mask = mask_inv)
+    background = np.stack((background,)*3, axis=-1)
+    img_ca = cv2.add(res, background)
+
+    cv2.imshow('@Sheeesh', img) 
+    cv2.imshow('@Sheeeshred', img_ca)
+
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+# close camera
+cap.release()
+cv2.destroyAllWindows()
